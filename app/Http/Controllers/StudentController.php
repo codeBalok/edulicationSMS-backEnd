@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Country;
 use App\Models\Disability_Types;
 use App\Models\DisabilityDetails;
+use App\Models\EmploymentDetails;
 use App\Models\LanguageDiversity;
-use App\Models\SpokenLanguage;
 use App\Models\Student;
 use App\Models\StudentDocument;
+use App\Models\StudentQualification;
+use App\Models\StudentSchooling;
 use App\Models\SurveyContactStatus;
 use App\Services\NatFileGenerator;
 use Exception;
@@ -115,10 +117,34 @@ class StudentController extends Controller {
                         // Assign selected disability
                         $data['selectedDisability'] =  array_merge($selectedDisabilities, $decodedDisability);
                         
-                        //dd($data['selectedDisability']);
-                
+                        //student schooling
+                        $data['schooling'] = StudentSchooling::join('students', 'students.id', '=', 'student_schoolings.student_id')
+                        ->where('student_schoolings.student_id',$id)
+                        ->orderBy('student_schoolings.student_id', 'asc')
+                        ->get(['students.*','student_schoolings.student_id as student_id','student_schoolings.still_schooling','student_schoolings.school_level','student_schoolings.is_school_completed','student_schoolings.school_completion_year']);
 
-            
+
+                        //student qualification
+                        $data['qualification'] = StudentQualification::join('students', 'students.id', '=', 'student_qualifications.student_id')
+                        ->where('student_qualifications.student_id',$id)
+                        ->orderBy('student_qualifications.student_id', 'asc')
+                        ->get(['students.*','student_qualifications.student_id as student_id','student_qualifications.qualification_completed','student_qualifications.qualification_level']);
+                        //dd( $data['qualification']);
+
+                        foreach ($data['qualification'] as $qualification) {
+                            // Decode the JSON data of qualification_level
+                            $qualification->qualification_level = json_decode($qualification->qualification_level);
+                        }
+                        $data['qualificationlevel']=$qualification->qualification_level;
+
+                        //employment detail
+                        $data['employment'] = EmploymentDetails::join('students', 'students.id', '=', 'employment_details.student_id')
+                        ->where('employment_details.student_id', $id)
+                        ->orderBy('employment_details.student_id', 'asc')
+                        ->get(['students.*', 'employment_details.student_id as student_id', 'employment_details.labour_status', 'employment_details.industryofemploymentid', 'employment_details.occupationidentifierid']);
+                    
+
+
                 $data['countries'] = Country::orderBy('id', 'asc')->get();
                 $data['blood_group'] = DB::table('blood_group')->get();
                 $data['marital_status'] = DB::table('marital_status')->get();
@@ -469,6 +495,289 @@ class StudentController extends Controller {
                  $disabilitydetail->medical_note = $data['medical_note'];
                  //dd($disabilitydetail);
                  $disabilitydetail->save();
+ 
+                 return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             }
+        }
+}
+public function editStudentSchooling(Request $request,$id)
+    {
+        $data = [];
+        $data['title'] = 'Edit Schooling';
+        $data['menu_active_tab'] = 'schooling-list';
+        if ($id) {
+            $student = Student::find($id);
+            //dd($student);
+            if ($student) {
+
+                 //studentdisability details
+                 $data['schooling'] = StudentSchooling::join('students', 'students.id', '=', 'student_schoolings.student_id')
+                 ->where('student_schoolings.student_id',$id)
+                 ->orderBy('student_schoolings.student_id', 'asc')
+                 ->get(['students.id as student_id','student_schoolings.*']);
+                // dd($data['schooling']);
+
+                $data['disability_types'] = Disability_Types::orderBy('id', 'asc')->get();
+               
+                 //studentdisability details
+                 $data['disabilitydetails'] = DisabilityDetails::join('students', 'students.id', '=', 'disability_details.student_id')
+                 ->where('disability_details.student_id',$id)
+                 ->orderBy('disability_details.student_id', 'asc')
+                 ->get(['students.id as student_id','disability_details.*']);
+
+                 $selectedDisabilities = [];
+                    foreach ($data['disabilitydetails'] as $disabilityDetail) {
+                        // Decode JSON string to an array
+                        $decodedDisability = json_decode($disabilityDetail->area_of_disability);
+
+                        // Merge the arrays
+                        $selectedDisabilities = array_merge($selectedDisabilities, $decodedDisability);
+                    }
+
+                    // Assign selected disabilities
+                    $data['selectedDisability'] = $selectedDisabilities;
+
+                 $data['surveystatus'] = SurveyContactStatus::join('students', 'students.survey_contact_status', '=', 'survey_contact_statuses.id')
+                 ->where('students.id',$id)
+                 ->orderBy('status_type', 'asc')
+                 ->get();
+ 
+                 //studentdocument
+                 $data['document'] = StudentDocument::join('students', 'students.id', '=', 'student_documents.student_id')
+                 ->where('student_documents.student_id',$id)
+                 ->orderBy('student_documents.student_id', 'asc')
+                 ->get();
+                 
+                 //language diversity
+                 $data['languagediversity'] = LanguageDiversity::orderBy('id', 'DESC')->get();
+                 
+                 $data['countries'] = Country::orderBy('id', 'asc')->get();
+                 $data['blood_group'] = DB::table('blood_group')->get();
+                 $data['marital_status'] = DB::table('marital_status')->get();
+                 $data['statuses'] = StatusType::where('status', '1')->orderBy('title', 'asc')->get();
+         
+
+                return view('admin.student_schooling.edit')->with($data);
+            } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+            }
+        } else {
+            return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+        }
+    }
+    public function updateStudentSchooling(Request $request, $id) {
+        //dd($student_id);
+         if ($id) {
+ 
+             $data = $request->input();
+             //dd($data);
+             $schooling= StudentSchooling::find($id);
+             if ($schooling) {
+                $schooling->student_id = $data['student_id'];
+                 $schooling->still_schooling = $data['still_schooling'];
+                
+                 $schooling->school_level = $data['school_level'];
+                 $schooling->is_school_completed = $data['is_school_completed'];
+                 $schooling->school_completion_year = $data['school_completion_year'];
+                 //dd($schooling);
+                 $schooling->save();
+ 
+                 return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             }
+        }
+}
+public function editStudentQualification(Request $request,$id)
+    {
+        $data = [];
+        $data['title'] = 'Edit Schooling';
+        $data['menu_active_tab'] = 'schooling-list';
+        if ($id) {
+            $student = Student::find($id);
+            //dd($student);
+            if ($student) {
+
+                //studentqalification
+                $data['schoolqualification'] = StudentQualification::join('students', 'students.id', '=', 'student_qualifications.student_id')
+                ->where('student_qualifications.student_id',$id)
+                ->orderBy('student_qualifications.student_id', 'asc')
+                ->get(['students.id as student_id','student_qualifications.*']);
+
+                foreach ($data['schoolqualification'] as $qualification) {
+                    // Decode the JSON data of qualification_level
+                    $qualification->qualification_level = json_decode($qualification->qualification_level);
+                }
+                $data['qualificationlevel']=$qualification->qualification_level;
+
+
+                 //student schooling
+                 $data['schooling'] = StudentSchooling::join('students', 'students.id', '=', 'student_schoolings.student_id')
+                 ->where('student_schoolings.student_id',$id)
+                 ->orderBy('student_schoolings.student_id', 'asc')
+                 ->get(['students.id as student_id','student_schoolings.*']);
+                // dd($data['schooling']);
+
+                $data['disability_types'] = Disability_Types::orderBy('id', 'asc')->get();
+               
+                 //studentdisability details
+                 $data['disabilitydetails'] = DisabilityDetails::join('students', 'students.id', '=', 'disability_details.student_id')
+                 ->where('disability_details.student_id',$id)
+                 ->orderBy('disability_details.student_id', 'asc')
+                 ->get(['students.id as student_id','disability_details.*']);
+
+                 $selectedDisabilities = [];
+                    foreach ($data['disabilitydetails'] as $disabilityDetail) {
+                        // Decode JSON string to an array
+                        $decodedDisability = json_decode($disabilityDetail->area_of_disability);
+
+                        // Merge the arrays
+                        $selectedDisabilities = array_merge($selectedDisabilities, $decodedDisability);
+                    }
+
+                    // Assign selected disabilities
+                    $data['selectedDisability'] = $selectedDisabilities;
+
+                 $data['surveystatus'] = SurveyContactStatus::join('students', 'students.survey_contact_status', '=', 'survey_contact_statuses.id')
+                 ->where('students.id',$id)
+                 ->orderBy('status_type', 'asc')
+                 ->get();
+ 
+                 //studentdocument
+                 $data['document'] = StudentDocument::join('students', 'students.id', '=', 'student_documents.student_id')
+                 ->where('student_documents.student_id',$id)
+                 ->orderBy('student_documents.student_id', 'asc')
+                 ->get();
+                 
+                 //language diversity
+                 $data['languagediversity'] = LanguageDiversity::orderBy('id', 'DESC')->get();
+                 
+                 $data['countries'] = Country::orderBy('id', 'asc')->get();
+                 $data['blood_group'] = DB::table('blood_group')->get();
+                 $data['marital_status'] = DB::table('marital_status')->get();
+                 $data['statuses'] = StatusType::where('status', '1')->orderBy('title', 'asc')->get();
+         
+
+                return view('admin.student_qualification.edit')->with($data);
+            } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+            }
+        } else {
+            return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+        }
+    }
+    public function updateStudentQualification(Request $request, $id) {
+        //dd($student_id);
+         if ($id) {
+ 
+             $data = $request->input();
+             //dd($data);
+             $qualification= StudentQualification::find($id);
+             if ($qualification) {
+                $qualification->student_id = $data['student_id'];
+                 $qualification->qualification_completed = $data['qualification_completed'];
+                 $qualification_levelJson = json_encode($request->input('qualification_level'));
+                 $qualification->qualification_level = $qualification_levelJson;
+                
+
+                 //dd($qualification);
+                 $qualification->save();
+ 
+                 return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+             }
+        }
+}
+public function editEmploymentDetail(Request $request,$id)
+    {
+        $data = [];
+        $data['title'] = 'Edit Emplyment';
+        $data['menu_active_tab'] = 'employment-list';
+        if ($id) {
+            $student = Student::find($id);
+            //dd($student);
+            if ($student) {
+
+                 //employment details
+                 $data['employment'] = EmploymentDetails::join('students', 'students.id', '=', 'employment_details.student_id')
+                 ->where('employment_details.student_id',$id)
+                 ->orderBy('employment_details.student_id', 'asc')
+                 ->get(['students.id as student_id','employment_details.*']);
+
+
+                 //studentdisability details
+                 $data['schooling'] = StudentSchooling::join('students', 'students.id', '=', 'student_schoolings.student_id')
+                 ->where('student_schoolings.student_id',$id)
+                 ->orderBy('student_schoolings.student_id', 'asc')
+                 ->get(['students.id as student_id','student_schoolings.*']);
+                // dd($data['schooling']);
+
+                $data['disability_types'] = Disability_Types::orderBy('id', 'asc')->get();
+               
+                 //studentdisability details
+                 $data['disabilitydetails'] = DisabilityDetails::join('students', 'students.id', '=', 'disability_details.student_id')
+                 ->where('disability_details.student_id',$id)
+                 ->orderBy('disability_details.student_id', 'asc')
+                 ->get(['students.id as student_id','disability_details.*']);
+
+                 $selectedDisabilities = [];
+                    foreach ($data['disabilitydetails'] as $disabilityDetail) {
+                        // Decode JSON string to an array
+                        $decodedDisability = json_decode($disabilityDetail->area_of_disability);
+
+                        // Merge the arrays
+                        $selectedDisabilities = array_merge($selectedDisabilities, $decodedDisability);
+                    }
+
+                    // Assign selected disabilities
+                    $data['selectedDisability'] = $selectedDisabilities;
+
+                 $data['surveystatus'] = SurveyContactStatus::join('students', 'students.survey_contact_status', '=', 'survey_contact_statuses.id')
+                 ->where('students.id',$id)
+                 ->orderBy('status_type', 'asc')
+                 ->get();
+ 
+                 //studentdocument
+                 $data['document'] = StudentDocument::join('students', 'students.id', '=', 'student_documents.student_id')
+                 ->where('student_documents.student_id',$id)
+                 ->orderBy('student_documents.student_id', 'asc')
+                 ->get();
+                 
+                 //language diversity
+                 $data['languagediversity'] = LanguageDiversity::orderBy('id', 'DESC')->get();
+                 
+                 $data['countries'] = Country::orderBy('id', 'asc')->get();
+                 $data['blood_group'] = DB::table('blood_group')->get();
+                 $data['marital_status'] = DB::table('marital_status')->get();
+                 $data['statuses'] = StatusType::where('status', '1')->orderBy('title', 'asc')->get();
+         
+
+                return view('admin.employment_details.edit')->with($data);
+            } else {
+                return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+            }
+        } else {
+            return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
+        }
+    }
+    public function updateEmploymentDetail(Request $request, $id) {
+        //dd($student_id);
+         if ($id) {
+ 
+             $data = $request->input();
+             //dd($data);
+             $employment= EmploymentDetails::find($id);
+             if ($employment) {
+                $employment->student_id = $data['student_id'];
+                 $employment->labour_status = $data['labour_status'];
+                 $employment->industryofemploymentid = $data['industryofemploymentid'];
+                 $employment->occupationidentifierid = $data['occupationidentifierid'];
+                
+                 //dd($schooling);
+                 $employment->save();
  
                  return redirect()->route('view-student',['id' => $id])->with('failed', 'Record not found.');
              } else {

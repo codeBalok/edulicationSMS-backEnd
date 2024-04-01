@@ -45,10 +45,10 @@
 																		<a class="nav-link" data-bs-toggle="tab" href="#message1"><i class="la la-envelope me-2"></i> Disability</a>
 																	</li>
                                                                     <li class="nav-item">
-																		<a class="nav-link" data-bs-toggle="tab" href="#message2"><i class="la la-envelope me-2"></i> Schooling</a>
+																		<a class="nav-link" data-bs-toggle="tab" href="#message2"><i class="la la-user me-2"></i> Schooling</a>
 																	</li>
                                                                     <li class="nav-item">
-																		<a class="nav-link" data-bs-toggle="tab" href="#message3"><i class="la la-envelope me-2"></i> Qualifications</a>
+																		<a class="nav-link" data-bs-toggle="tab" href="#message3"><i class="la la-phone me-2"></i> Qualifications</a>
 																	</li>
                                                                     <li class="nav-item">
 																		<a class="nav-link" data-bs-toggle="tab" href="#message4"><i class="la la-envelope me-2"></i> Employement</a>
@@ -524,39 +524,217 @@
 </div>
 </div>
 </div>
-                                                                    <div class="tab-pane fade" id="message2">
-																		<div class="pt-4">
-																			<h4>This is message title</h4>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																		</div>
-																	</div>
-                                                                    <div class="tab-pane fade" id="message3">
-																		<div class="pt-4">
-																			<h4>This is message title</h4>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																		</div>
-																	</div>
-                                                                    <div class="tab-pane fade" id="message4">
-																		<div class="pt-4">
-																			<h4>This is message title</h4>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																			<p>Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
-																			</p>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-													<div class="tab-pane fade " id="DefaultTab1-html" role="tabpanel" aria-labelledby="home-tab1">
-														<div class="card-body p-0 code-area">
+
+<div class="tab-pane fade" id="message2">
+	<div class="pt-4">
+		<h4>Student Schooling</h4>
+<div>
+      <div style="float:left;padding-left:150px;">
+        @foreach ($schooling as $school) 
+            <div style="padding:5px;width:400px;font-weight:bold;float:left">Still at school?</div>
+            <div style="padding:5px 20px; float:left">
+            @if($school->still_schooling==0)
+                                                <label>No</label>
+                                                @else
+                                                <label>Yes</label>
+                                                @endif    
+            </div>
+            <br>
+    
+             <div style="padding:5px;width:400px;font-weight:bold;float:left;">Highest school level completed?</div>
+                <div style="padding:0px 20px;float:left;">  
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="02" {{ $school->school_level == 2 ? 'checked' : '' }} disabled> Did not go to school
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="08" {{ $school->school_level == 8 ? 'checked' : '' }} disabled> Year 8 or below
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="09"{{ $school->school_level == 9 ? 'checked' : '' }} disabled>Year 9 or equivalent
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="10" {{ $school->school_level == 10 ? 'checked' : '' }} disabled>Completed Year 10
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="11" {{ $school->school_level == 11 ? 'checked' : '' }} disabled>Completed Year 11
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="12" {{ $school->school_level == 12 ? 'checked' : '' }} disabled>Completed Year 12
+                    </div>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="school_level" value="00" {{ $school->school_level == 0 ? 'checked' : '' }} disabled>Not specified
+                    </div> 
+                    <br>     
+                </div>
+            <br>
+            <div style="padding:5px;width:400px;font-weight:bold;float:left;">Year school level was completed: </div>
+                <div style="padding:0px 20px;float:left;">
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="is_school_completed" id="is_school_completed_yes" value="1" {{ $school->is_school_completed == 1 ? 'checked' : '' }} disabled> Yes
+                    </div>
+                    <div id="completion_year_input" style="display: {{ $school->is_school_completed == 1 ? 'block' : 'none' }}">
+                        <input class="form-control" type="text" name="school_completion_year" id="school_completion_year" value="{{ $school->school_completion_year }}" placeholder="Completion Year" readonly>
+                    </div>
+                    <br>
+                    <div style="padding:2px 0px;">
+                    <input type="radio" style="margin-right:4px;" name="is_school_completed" id="is_school_completed_no" value="0" {{ $school->is_school_completed == 0 ? 'checked' : '' }} disabled> No
+                    </div>
+                   
+                </div>
+            <br>
+        @endforeach
+    </div>
+    <div style="clear:both; height:20px;"></div>
+		<div style="clear:both; text-align:center">
+        <a type="button" href="{{ route('edit-studentschooling', $student->id) }}" class="btn btn-primary">Edit</a>
+    </div>
+</div>
+</div>
+</div>
+    <div class="tab-pane fade" id="message3">
+		<div class="pt-4">
+		    <h4>Qualifications</h4>
+            <div> 
+                <div style="float:left;padding-left:150px;">
+                  @foreach ($qualification as $qualifications) 
+                             <div style="padding:5px;width:400px;font-weight:bold;float:left">Completed any of the following qualifications?</div>
+                                <div style="padding:5px 20px;float:left">
+                                    @if($qualifications->qualification_completed==0)
+                                        <label>Not Provided</label>
+                                    @elseif($qualifications->qualification_completed==1)
+                                        <label>Yes</label>
+                                    @else
+                                        <label>No</label>
+                                    @endif      
+                               </div>
+                     <div style="clear:both;height:10px;"></div>
+                        <div style="padding:5px;font-weight:bold;width:400px;float:left;">Highest level of qualification you hold? </div>
+                            <div style="padding:5px 20px;line-height:20px;float:left;">
+                            @foreach ([
+                                "008" => "Bachelor Degree or Higher Degree level",
+                                "410" => "Advanced Diploma or Associate Degree Level",
+                                "420" => "Diploma (or Associate Diploma) Level",
+                                "511" => "Certificate IV (or advanced certificate/technician)",
+                                "514" => "Certificate III (or trade certificate)",
+                                "521" => "Certificate II",
+                                "990" => "Certificates other than the above",
+                                "524" => "Certificate I",
+                                ] as $value => $label)
+                                <input type="checkbox" class="custom-checkbox" style="margin-right:4px;" name="qualification_level[]" value="{{ $value }}" {{ is_array($qualificationlevel) && in_array($value, $qualificationlevel) ? 'checked' : '' }} disabled="">
+                                {{ $label }} <br>
+                            @endforeach
+
+                        @if(!is_array($qualificationlevel))
+                            <p>No qualification levels retrieved from the database.</p>
+                        @endif      
+                        </div>
+
+                  @endforeach
+                </div>
+                <div style="clear:both; text-align:center">
+            <a type="button" href="{{ route('edit-studentqualification', $student->id) }}" class="btn btn-primary">Edit</a>
+            </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="message4">
+		<div class="pt-4">
+			<h4>Emplyoment</h4>
+		<div>
+                        <div style="float:left;padding-left:150px;">
+                        @foreach ($employment as $employ) 
+                            <div style="padding:5px;width:320px;font-weight:bold;float:left;">Employment</div>
+                                <div style="padding:0px 20px;float:left;">  
+                                    <div style="padding:2px 0px;">
+								    <input type="radio" style="margin-right:4px;" name="labour_status" value="01" {{ $employ->labour_status == 1 ? 'checked' : '' }} disabled="">Full-time employee
+                                    </div>
+                                    <div style="padding:2px 0px;">
+								    <input type="radio" style="margin-right:4px;" name="labour_status" value="02" {{ $employ->labour_status == 2 ? 'checked' : '' }} disabled="">Part-time employee
+                                    </div>
+                                    <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="03" {{ $employ->labour_status == 3 ? 'checked' : '' }} disabled="">Self-employed - not employing others
+                                    </div>
+                                    <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="04" {{ $employ->labour_status == 4 ? 'checked' : '' }} disabled="">Employer
+                                    </div>
+                                        <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="05" {{ $employ->labour_status == 5 ? 'checked' : '' }} disabled="">Employed - unpaid worker in family business
+                                    </div>
+                                    <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="06" {{ $employ->labour_status == 6 ? 'checked' : '' }} disabled="">Unemployed - seeking full-time work
+                                    </div>
+                                    <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="07" {{ $employ->labour_status == 7 ? 'checked' : '' }} disabled="">Unemployed seeking part-time work
+                                    </div>
+                                    <div style="padding:2px 0px;">
+                                        <input type="radio" style="margin-right:4px;" name="labour_status" value="08" {{ $employ->labour_status == 8 ? 'checked' : '' }} disabled="">Not employed - not seeking employment
+                                    </div>        
+                                 </div>
+                            <div style="clear:both;"></div>     
+                        </div>
+                <div style="clear:both; height:20px;"></div>
+                    <div style="float:left;padding-left:150px;">
+                            <div style="padding:5px;width:320px;font-weight:bold;float:left;">Industry of Employment</div>
+                            <div style="padding:0px 20px;float:left;"> 
+                                <select class="form-control" name="industryofemploymentid" id="industryofemploymentid" disabled="" style="width:320px;">
+                                <option value="">Select</option>
+                                <option value="A" {{ $employ->industryofemploymentid == 'A' ? 'selected' : '' }}>Agriculture, Forestry and Fishing</option>
+                                <option value="B" {{ $employ->industryofemploymentid == 'B' ? 'selected' : '' }}>Mining</option>
+                                <option value="C" {{ $employ->industryofemploymentid == 'C' ? 'selected' : '' }}>Manufacturing</option>
+                                <option value="D" {{ $employ->industryofemploymentid == 'D' ? 'selected' : '' }}>Electricity, Gas, Water and Waste Services</option>
+                                <option value="E" {{ $employ->industryofemploymentid == 'E' ? 'selected' : '' }}>Construction</option>
+                                <option value="F" {{ $employ->industryofemploymentid == 'F' ? 'selected' : '' }}>Wholesale Trade</option>
+                                <option value="G" {{ $employ->industryofemploymentid == 'G' ? 'selected' : '' }}>Retail Trade</option>
+                                <option value="H" {{ $employ->industryofemploymentid == 'H' ? 'selected' : '' }}>Accommodation and Food Services</option>
+                                <option value="I" {{ $employ->industryofemploymentid == 'I' ? 'selected' : '' }}>Transport, Postal and Warehousing</option>
+                                <option value="J" {{ $employ->industryofemploymentid == 'J' ? 'selected' : '' }}>Information Media and Telecommunications</option>
+                                <option value="K" {{ $employ->industryofemploymentid == 'K' ? 'selected' : '' }}>Financial and Insurance Services</option>
+                                <option value="L" {{ $employ->industryofemploymentid == 'L' ? 'selected' : '' }}>Rental, Hiring and Real Estate Services</option>
+                                <option value="M" {{ $employ->industryofemploymentid == 'M' ? 'selected' : '' }}>Professional, Scientific and Technical Services</option>
+                                <option value="N" {{ $employ->industryofemploymentid == 'N' ? 'selected' : '' }}>Administrative and Support Services</option>
+                                <option value="O" {{ $employ->industryofemploymentid == 'O' ? 'selected' : '' }}>Public Administration and Safety</option>
+                                <option value="P" {{ $employ->industryofemploymentid == 'P' ? 'selected' : '' }}>Education and Training</option>
+                                <option value="Q" {{ $employ->industryofemploymentid == 'Q' ? 'selected' : '' }}>Health Care and Social Assistance</option>
+                                <option value="R" {{ $employ->industryofemploymentid == 'R' ? 'selected' : '' }}>Arts and Recreation Services</option>
+                                <option value="S" {{ $employ->industryofemploymentid == 'S' ? 'selected' : '' }}>Other Services</option>				
+                            </select>
+                            </div>
+                   <div style="clear:both;"></div>
+                    </div>
+                    <div style="clear:both; height:20px;"></div>
+                    <div style="float:left;padding-left:150px;">
+                        <div style="padding:5px;width:320px;font-weight:bold;float:left;">Occupation Identifier</div>
+                        <div style="padding:0px 20px;float:left;"> 
+                            <select class="form-control" name="occupationidentifierid" id="occupationidentifierid" disabled="" style="width:320px;">
+                            <option value="">Select</option>
+                            <option value="1" {{ $employ->occupationidentifierid == 1 ? 'selected' : '' }}>Manager</option>
+                            <option value="2" {{ $employ->occupationidentifierid == 2 ? 'selected' : '' }}>Professionals</option>
+                            <option value="3" {{ $employ->occupationidentifierid == 3 ? 'selected' : '' }}>Technicians and Trades Workers</option>
+                            <option value="4" {{ $employ->occupationidentifierid == 4 ? 'selected' : '' }}>Community and Personal Service Workers</option>
+                            <option value="5" {{ $employ->occupationidentifierid == 5 ? 'selected' : '' }}>Clerical and Administrative Workers</option>
+                            <option value="6" {{ $employ->occupationidentifierid == 6 ? 'selected' : '' }}>Sales Workers</option>
+                            <option value="7" {{ $employ->occupationidentifierid == 7 ? 'selected' : '' }}>Machinery Operators and Drivers</option>
+                            <option value="8" {{ $employ->occupationidentifierid == 8 ? 'selected' : '' }}>Labourer’s</option>
+                            <option value="9" {{ $employ->occupationidentifierid == 9 ? 'selected' : '' }}>Other</option>				
+                        </select>
+                        </div>
+                        <div style="clear:both;"></div>
+                    @endforeach 
+                        </div>
+ 		    <div style="clear:both; height:20px;"></div>
+                <div style="clear:both; text-align:center">
+                <a type="button" href="{{ route('edit-employmentdetail', $student->id) }}" class="btn btn-primary">Edit</a>	            
+                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-pane fade " id="DefaultTab1-html" role="tabpanel" aria-labelledby="home-tab1">
+	<div class="card-body p-0 code-area">
 		<pre class="m-0"> <code class="language-html">&lt;!-- Nav tabs --&gt;
 		&lt;div class="custom-tab-1"&gt;
 			&lt;ul class="nav nav-tabs"&gt;
@@ -571,6 +749,15 @@
 				&lt;/li&gt;
 				&lt;li class="nav-item"&gt;
 					&lt;a class="nav-link" data-bs-toggle="tab" href="#message1"&gt;&lt;i class="la la-envelope me-2"&gt;&lt;/i&gt; Message&lt;/a&gt;
+				&lt;/li&gt;
+                &lt;li class="nav-item"&gt;
+					&lt;a class="nav-link" data-bs-toggle="tab" href="#message2"&gt;&lt;i class="la la-envelope me-2"&gt;&lt;/i&gt; Message&lt;/a&gt;
+				&lt;/li&gt;
+                &lt;li class="nav-item"&gt;
+					&lt;a class="nav-link" data-bs-toggle="tab" href="#message3"&gt;&lt;i class="la la-envelope me-2"&gt;&lt;/i&gt; Message&lt;/a&gt;
+				&lt;/li&gt;
+                &lt;li class="nav-item"&gt;
+					&lt;a class="nav-link" data-bs-toggle="tab" href="#message4"&gt;&lt;i class="la la-envelope me-2"&gt;&lt;/i&gt; Message&lt;/a&gt;
 				&lt;/li&gt;
 			&lt;/ul&gt;
 			&lt;div class="tab-content"&gt;
@@ -610,14 +797,41 @@
 						&lt;/p&gt;
 					&lt;/div&gt;
 				&lt;/div&gt;
+                &lt;div class="tab-pane fade" id="message2"&gt;
+					&lt;div class="pt-4"&gt;
+						&lt;h4&gt;This is message title&lt;/h4&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+					&lt;/div&gt;
+				&lt;/div&gt;
+                &lt;div class="tab-pane fade" id="message3"&gt;
+					&lt;div class="pt-4"&gt;
+						&lt;h4&gt;This is message title&lt;/h4&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+					&lt;/div&gt;
+				&lt;/div&gt;
+                &lt;div class="tab-pane fade" id="message4"&gt;
+					&lt;div class="pt-4"&gt;
+						&lt;h4&gt;This is message title&lt;/h4&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+						&lt;p&gt;Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro synth master cleanse. Mustache cliche tempor.
+						&lt;/p&gt;
+					&lt;/div&gt;
+				&lt;/div&gt;
 			&lt;/div&gt;
 		&lt;/div&gt;</code></pre>
-														</div>
-													</div>
-												</div>
+	</div>
+</div>
+</div>
 
-											</div>
-										</div>
+</div>
+</div>
 										<!-- /Column  -->
 										<!-- Column  -->
 <div class="col-xl-12">
@@ -726,5 +940,23 @@
 
 
 
+<script>
+    // Get references to the radio buttons and the completion year input
+    var isSchoolCompletedYes = document.getElementById('is_school_completed_yes');
+    var isSchoolCompletedNo = document.getElementById('is_school_completed_no');
+    var completionYearInput = document.getElementById('completion_year_input');
 
+    // Add event listener to the radio buttons to toggle the visibility of the completion year input
+    isSchoolCompletedYes.addEventListener('change', function() {
+        if (this.checked) {
+            completionYearInput.style.display = 'block';
+        }
+    });
+
+    isSchoolCompletedNo.addEventListener('change', function() {
+        if (this.checked) {
+            completionYearInput.style.display = 'none';
+        }
+    });
+</script>
 @endsection

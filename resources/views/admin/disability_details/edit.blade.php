@@ -41,7 +41,7 @@
 		    <div style="clear:both;height:30px;"></div>
 		<div align="center">
 			<button type="submit" class="btn btn-primary" style="margin:0px 5px;">Save</button>
-			<button type="button" class="btn btn-primary" style="margin:0px 5px;" onclick="unsaved=true;editDisability(514361, 'view');">Cancel</button>
+			
 		</div>
 	</form>
 @endforeach

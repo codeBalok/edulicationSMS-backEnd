@@ -127,7 +127,12 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/delete-document/{id}', [StudentController::class, 'deleteDcoument'])->name('delete-document');
         Route::get('/edit-disabilitydetail/{id}', [StudentController::class, 'editDisability'])->name('edit-disabilitydetail');
         Route::post('/update-disabilitydetail/{id}', [StudentController::class, 'updateDisability'])->name('update-disabilitydetail');
-       
+        Route::get('/edit-studentschooling/{id}', [StudentController::class, 'editStudentSchooling'])->name('edit-studentschooling');
+        Route::post('/update-studentschooling/{id}', [StudentController::class, 'updateStudentSchooling'])->name('update-studentschooling');
+        Route::get('/edit-studentqualification/{id}', [StudentController::class, 'editStudentQualification'])->name('edit-studentqualification');
+        Route::post('/update-studentqualification/{id}', [StudentController::class, 'updateStudentQualification'])->name('update-studentqualification');
+        Route::get('/edit-employmentdetail/{id}', [StudentController::class, 'editEmploymentDetail'])->name('edit-employmentdetail');
+        Route::post('/update-employmentdetail/{id}', [StudentController::class, 'updateEmploymentDetail'])->name('update-employmentdetail');
 
       // START - Language Diversity
       Route::get('/add-languagediversity', [LanguageDiversityController::class, 'add'])->name('add-languagediversity');
